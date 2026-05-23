@@ -55,7 +55,13 @@
     const cfg = basemaps[ui.basemap];
     const opts: any = { attribution: cfg.attribution, maxZoom: cfg.maxZoom };
     if (cfg.subdomains) opts.subdomains = cfg.subdomains;
-    tileLayer = L.tileLayer(cfg.url, opts).addTo(map);
+    tileLayer = L.tileLayer(cfg.url, opts);
+    // Cached tiles can land before the load listener attaches, leaving them stuck
+    // at opacity 0. Force opacity to 1 after the image is decoded.
+    tileLayer.on('tileload', (e: any) => {
+      e.tile.style.opacity = '1';
+    });
+    tileLayer.addTo(map);
     tileLayer.bringToBack();
   }
 
@@ -78,9 +84,14 @@
     const el = pdfOverlay.getElement() as HTMLImageElement | undefined;
     if (!el) return;
     const r = ui.pdfRotation || 0;
+    // Strip any rotation we previously added; only append if non-zero so we
+    // don't fight Leaflet's own transform updates during pan/zoom.
+    const existing = el.style.transform.replace(/\s*rotate\([^)]*\)/g, '').trim();
+    if (r === 0) {
+      el.style.transform = existing;
+      return;
+    }
     el.style.transformOrigin = 'center center';
-    // Leaflet already applies translate3d to position the overlay — append rotation.
-    const existing = el.style.transform.replace(/\s*rotate\([^)]*\)/g, '');
     el.style.transform = `${existing} rotate(${r}deg)`.trim();
   }
 
