@@ -36,6 +36,19 @@
     map.setView([cLat, cLng], 18);
     map.on('moveend zoomend viewreset', () => applyPDFRotation());
 
+    // Delegate clicks inside popups (the "Edit overrides" link).
+    map.on('popupopen', (e: any) => {
+      const root: HTMLElement = e.popup.getElement();
+      if (!root) return;
+      const btn = root.querySelector('[data-action="open-sheet"]') as HTMLButtonElement | null;
+      if (btn) {
+        btn.addEventListener('click', () => {
+          ui.sheetOpen = true;
+          map.closePopup();
+        }, { once: true });
+      }
+    });
+
     applyBasemap();
     buildLayers();
     applyPDF();
@@ -112,8 +125,8 @@
         L.circleMarker([a.lat, a.lng], {
           radius: 3, color: '#222', weight: 0.6, fillColor: '#fff', fillOpacity: 0.9
         })
-          .bindTooltip(`${a.street} ${a.housenumber}`, { direction: 'top' })
-          .on('click', () => { ui.selectedAddressId = a.id; ui.selectedSpotId = null; ui.sheetOpen = true; })
+          .bindPopup(() => addressPopupHTML(a.id), { autoPan: false, closeButton: true })
+          .on('click', () => { ui.selectedAddressId = a.id; ui.selectedSpotId = null; })
       )
     );
 
@@ -128,8 +141,8 @@
         L.circleMarker([s.lat, s.lng], {
           radius: 6, color: '#003e8c', weight: 1.5, fillColor: '#3af', fillOpacity: 0.95
         })
-          .bindTooltip(`bike rack · ${s.street} (${s.side})`, { direction: 'top' })
-          .on('click', () => { ui.selectedSpotId = s.id; ui.selectedAddressId = null; ui.sheetOpen = true; })
+          .bindPopup(() => spotPopupHTML(s.id, 'bike'), { autoPan: false, closeButton: true })
+          .on('click', () => { ui.selectedSpotId = s.id; ui.selectedAddressId = null; })
       )
     );
 
@@ -138,8 +151,8 @@
         L.circleMarker([s.lat, s.lng], {
           radius: 5, color: '#7a2900', weight: 1, fillColor: '#f96', fillOpacity: 0.95
         })
-          .bindTooltip(`car spot · ${s.street} (${s.side})`, { direction: 'top' })
-          .on('click', () => { ui.selectedSpotId = s.id; ui.selectedAddressId = null; ui.sheetOpen = true; })
+          .bindPopup(() => spotPopupHTML(s.id, 'car'), { autoPan: false, closeButton: true })
+          .on('click', () => { ui.selectedSpotId = s.id; ui.selectedAddressId = null; })
       )
     );
 
@@ -147,9 +160,49 @@
       layers.trees.map((t) =>
         L.circleMarker([t.lat, t.lng], {
           radius: 4, color: '#0a5e1c', weight: 1.5, fillColor: '#3aa64a', fillOpacity: 0.8
-        }).bindTooltip('tree (detected from PDF)', { direction: 'top' })
+        }).bindPopup('Tree (detected from PDF)', { autoPan: false, closeButton: true })
       )
     );
+  }
+
+  function addressPopupHTML(id: string): string {
+    const a = layers.addresses.find((x) => x.id === id);
+    if (!a) return '';
+    const asg = results.assignments.find((x) => x.addressId === id);
+    const bike = asg ? `${Math.round(asg.nearestBikeMeters)} m` : '—';
+    const car = asg ? `${Math.round(asg.nearestCarMeters)} m` : '—';
+    return `<div class="pp">
+      <strong>${esc(a.street)} ${esc(a.housenumber)}</strong>
+      <table>
+        <tr><td>Nearest bike rack</td><td>${bike}</td></tr>
+        <tr><td>Nearest car spot</td><td>${car}</td></tr>
+      </table>
+      <button type="button" class="pp-more" data-action="open-sheet">Edit overrides →</button>
+    </div>`;
+  }
+
+  function spotPopupHTML(id: string, kind: 'bike' | 'car'): string {
+    const s = (kind === 'bike' ? layers.bikeDesign : layers.carDesign).find((x) => x.id === id);
+    if (!s) return '';
+    const load = (kind === 'bike' ? results.bikeLoad : results.carLoad).find((r) => r.spotId === id);
+    const util = load ? `${(load.utilization * 100).toFixed(0)}%` : '—';
+    const cap = load?.capacity ?? s.capacity;
+    const assigned = load ? load.assigned.toFixed(1) : '—';
+    const addr = load?.addresses.length ?? 0;
+    const over = load && load.utilization > 1;
+    return `<div class="pp">
+      <strong>${kind === 'bike' ? 'Bike rack' : 'Car spot'} · ${esc(s.street ?? '')}</strong>
+      <table>
+        <tr><td>Capacity</td><td>${cap}</td></tr>
+        <tr><td>Demand</td><td>${assigned}</td></tr>
+        <tr><td>Utilization</td><td${over ? ' class="over"' : ''}>${util}</td></tr>
+        <tr><td>Addresses served</td><td>${addr}</td></tr>
+      </table>
+    </div>`;
+  }
+
+  function esc(s: string): string {
+    return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
   }
 
   function bindToggles() {
@@ -263,5 +316,54 @@
   }
   @media (prefers-color-scheme: dark) {
     .map, :global(.leaflet-container) { background: #1a1c1e; }
+  }
+
+  :global(.leaflet-popup-content) {
+    margin: 10px 14px;
+    font: 13px/1.4 -apple-system, system-ui, sans-serif;
+    min-width: 180px;
+  }
+  :global(.leaflet-popup-content .pp strong) {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+  :global(.leaflet-popup-content table) {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 12px;
+  }
+  :global(.leaflet-popup-content td) {
+    padding: 2px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  :global(.leaflet-popup-content td:last-child) {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  :global(.leaflet-popup-content td.over) {
+    color: #c22;
+    font-weight: 600;
+  }
+  :global(.leaflet-popup-content .pp-more) {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: #0a64c8;
+    font: inherit;
+    font-size: 12px;
+    padding: 8px 0 2px;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+  }
+  @media (prefers-color-scheme: dark) {
+    :global(.leaflet-popup-content-wrapper),
+    :global(.leaflet-popup-tip) {
+      background: #222528;
+      color: #e6e8eb;
+    }
+    :global(.leaflet-popup-content td) { border-color: #2a2d31; }
+    :global(.leaflet-popup-close-button) { color: #aaa !important; }
   }
 </style>
