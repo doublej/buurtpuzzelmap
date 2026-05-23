@@ -54,7 +54,9 @@
     const overCar = results.carLoad.filter((r) => r.utilization > 1).length;
     const peakBike = results.bikeLoad.reduce((m, r) => Math.max(m, r.utilization), 0);
     const peakCar = results.carLoad.reduce((m, r) => Math.max(m, r.utilization), 0);
-    return { bikeCapacity, bikeAssigned, carCapacity, carAssigned, overBike, overCar, peakBike, peakCar };
+    const avgBike = bikeCapacity > 0 ? bikeAssigned / bikeCapacity : 0;
+    const avgCar = carCapacity > 0 ? carAssigned / carCapacity : 0;
+    return { bikeCapacity, bikeAssigned, carCapacity, carAssigned, overBike, overCar, peakBike, peakCar, avgBike, avgCar };
   });
 
   function updateOverride(field: 'households' | 'persons' | 'cars' | 'bikes', value: string) {
@@ -132,10 +134,12 @@
         <tr><td>Bike capacity (design)</td><td>{totals.bikeCapacity}</td></tr>
         <tr><td>Bike demand (assigned)</td><td>{Math.round(totals.bikeAssigned)}</td></tr>
         <tr><td>Bike spots over capacity</td><td>{totals.overBike}</td></tr>
+        <tr><td>Bike avg utilization</td><td class:over={totals.avgBike > 1}>{(totals.avgBike * 100).toFixed(0)}%</td></tr>
         <tr><td>Bike peak utilization</td><td class:over={totals.peakBike > 1}>{(totals.peakBike * 100).toFixed(0)}%</td></tr>
         <tr><td>Car capacity (design)</td><td>{totals.carCapacity}</td></tr>
         <tr><td>Car demand (assigned)</td><td>{Math.round(totals.carAssigned)}</td></tr>
         <tr><td>Car spots over capacity</td><td>{totals.overCar}</td></tr>
+        <tr><td>Car avg utilization</td><td class:over={totals.avgCar > 1}>{(totals.avgCar * 100).toFixed(0)}%</td></tr>
         <tr><td>Car peak utilization</td><td class:over={totals.peakCar > 1}>{(totals.peakCar * 100).toFixed(0)}%</td></tr>
       </tbody>
     </table>

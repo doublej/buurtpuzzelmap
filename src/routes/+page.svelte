@@ -4,7 +4,7 @@
   import Sidebar from '$lib/Sidebar.svelte';
   import { loadAllLayers, type Layers } from '$lib/data/load';
   import { defaults, overrides, results, loadOverrides } from '$lib/state.svelte';
-  import { assignAll, computeLoad, defaultDemand } from '$lib/calc/assignment';
+  import { assignAll, computeLoadGravity, defaultDemand } from '$lib/calc/assignment';
 
   let layers = $state<Layers | null>(null);
   let error = $state<string | null>(null);
@@ -45,8 +45,10 @@
     );
 
     results.assignments = assignments;
-    results.bikeLoad = computeLoad(bikeSpots, assignments, demands, 'bike');
-    results.carLoad = computeLoad(carSpots, assignments, demands, 'car');
+    // Gravity-weighted split across the 3 nearest spots within walking band.
+    // Bikes: 150 m. Cars: 250 m (people walk further for a car).
+    results.bikeLoad = computeLoadGravity(layers.addresses, bikeSpots, demands, 'bike', 150, 3);
+    results.carLoad = computeLoadGravity(layers.addresses, carSpots, demands, 'car', 250, 3);
   });
 </script>
 
