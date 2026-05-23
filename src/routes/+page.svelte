@@ -62,13 +62,48 @@
 </main>
 
 <style>
-  :global(html, body) { margin: 0; padding: 0; height: 100%; }
-  :global(body) { font: 14px/1.4 -apple-system, system-ui, sans-serif; }
-  .app { position: fixed; inset: 0; }
+  :global(html) {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    touch-action: manipulation;
+    overscroll-behavior: none;
+    -webkit-text-size-adjust: 100%;
+    color-scheme: light dark;
+  }
+  :global(body) {
+    margin: 0;
+    padding: 0;
+    height: 100dvh;
+    font: 14px/1.4 -apple-system, system-ui, sans-serif;
+    background: #eef;
+    overflow: hidden;
+  }
+  :global(*) { -webkit-tap-highlight-color: transparent; }
+
+  .app {
+    position: fixed;
+    inset: 0;
+    height: 100dvh;
+  }
   .loading, .error {
     position: absolute; inset: 0;
     display: grid; place-items: center;
     color: #555;
+    padding: 20px;
+    text-align: center;
   }
   .error { color: #c22; }
+
+  @media (prefers-color-scheme: dark) {
+    :global(body) { background: #111315; color: #eee; }
+    .loading { color: #ccc; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(*), :global(*::before), :global(*::after) {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 </style>

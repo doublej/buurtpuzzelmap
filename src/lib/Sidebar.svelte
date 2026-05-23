@@ -69,7 +69,17 @@
   }
 </script>
 
-<aside class="sidebar">
+<aside class="sidebar" class:open={ui.sheetOpen}>
+  <button class="handle" type="button" onclick={() => (ui.sheetOpen = !ui.sheetOpen)} aria-label={ui.sheetOpen ? 'Collapse panel' : 'Expand panel'}>
+    <span class="grip"></span>
+    <span class="handle-summary">
+      <strong>Buurtpuzzelmap</strong>
+      <span class="muted">{layers.addresses.length} adressen · {Math.round(totals.bikeAssigned)} fietsen / {totals.bikeCapacity}</span>
+    </span>
+    <span class="caret" aria-hidden="true">{ui.sheetOpen ? '×' : '☰'}</span>
+  </button>
+
+  <div class="scroll">
   <header>
     <h1>Buurtpuzzelmap</h1>
     <p>Rivierenwijk Utrecht — design + parking-load model</p>
@@ -218,39 +228,235 @@
     <p>Bike racks + trees: detected from the design PDF via color thresholding (blue dashes = fietsnietjes per legend).</p>
     <p>Car parking: still interpolated along centerlines — not yet detected.</p>
   </footer>
+  </div>
 </aside>
 
 <style>
+  /* ── shared layout ──────────────────────────────────────────────── */
   .sidebar {
-    position: absolute;
-    top: 0; right: 0; bottom: 0;
-    width: 340px;
-    overflow-y: auto;
-    padding: 16px 20px;
-    background: rgba(255,255,255,0.96);
-    backdrop-filter: blur(4px);
-    border-left: 1px solid #ddd;
-    font: 13px/1.4 -apple-system, system-ui, sans-serif;
-    color: #222;
+    position: fixed;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    font: 14px/1.45 -apple-system, system-ui, sans-serif;
+    color: #1a1a1a;
     z-index: 1000;
+    display: flex;
+    flex-direction: column;
   }
-  h1 { font-size: 18px; margin: 0 0 2px; }
-  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; color: #555; margin: 18px 0 6px; }
-  h3 { font-size: 12px; color: #555; margin: 12px 0 4px; text-transform: uppercase; letter-spacing: 0.04em; }
-  header p { color: #666; margin: 0 0 8px; font-size: 12px; }
+  .scroll {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 4px 20px 20px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ── mobile: bottom sheet ──────────────────────────────────────── */
+  @media (max-width: 767px) {
+    .sidebar {
+      left: 0;
+      right: 0;
+      bottom: 0;
+      max-height: 88dvh;
+      border-top: 1px solid #ddd;
+      border-radius: 16px 16px 0 0;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.12);
+      padding-bottom: env(safe-area-inset-bottom);
+      transform: translateY(calc(100% - 72px - env(safe-area-inset-bottom)));
+      transition: transform 220ms cubic-bezier(0.32, 0.72, 0, 1);
+    }
+    .sidebar.open {
+      transform: translateY(0);
+    }
+    .scroll {
+      max-height: calc(88dvh - 72px - env(safe-area-inset-bottom));
+    }
+  }
+
+  /* ── handle / sheet header ─────────────────────────────────────── */
+  .handle {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    align-items: center;
+    gap: 4px 12px;
+    padding: 10px 20px 12px;
+    width: 100%;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+    border-bottom: 1px solid #eee;
+  }
+  .grip {
+    grid-column: 1 / -1;
+    width: 40px;
+    height: 5px;
+    background: #c8c8c8;
+    border-radius: 999px;
+    margin: 0 auto 4px;
+  }
+  .handle-summary {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+  }
+  .handle-summary strong {
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .handle-summary .muted {
+    color: #666;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  .caret {
+    font-size: 22px;
+    color: #666;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+  }
+  .handle:active .caret { background: #eee; }
+
+  /* ── desktop: right rail (last, so it overrides general .handle/.scroll) ── */
+  @media (min-width: 768px) {
+    .sidebar {
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 360px;
+      border-left: 1px solid #ddd;
+      padding-top: env(safe-area-inset-top);
+      padding-right: env(safe-area-inset-right);
+    }
+    .handle { display: none; }
+    .scroll { padding-top: 16px; }
+  }
+
+  /* ── content ────────────────────────────────────────────────────── */
+  h1 { font-size: 18px; margin: 12px 0 2px; }
+  h2 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #555;
+    margin: 18px 0 8px;
+    font-weight: 600;
+  }
+  h3 {
+    font-size: 11px;
+    color: #555;
+    margin: 12px 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+  header p { color: #666; margin: 0 0 8px; font-size: 13px; }
   section { border-top: 1px solid #eee; padding-top: 4px; }
-  label { display: flex; align-items: center; gap: 6px; padding: 2px 0; }
+  label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    min-height: 32px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
   label.num { justify-content: space-between; }
-  label.range { flex-direction: column; align-items: stretch; }
-  input[type="number"] { width: 80px; padding: 2px 4px; }
-  input[type="range"] { width: 100%; }
-  select { width: 100%; padding: 4px; }
-  table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  td { padding: 3px 0; border-bottom: 1px solid #f0f0f0; }
+  label.range { flex-direction: column; align-items: stretch; gap: 4px; }
+  input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #0a64c8;
+    flex-shrink: 0;
+  }
+  input[type="number"] {
+    width: 90px;
+    padding: 8px 10px;
+    font: inherit;
+    font-size: 16px;   /* >=16px prevents iOS auto-zoom */
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fff;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    min-height: 36px;
+  }
+  input[type="range"] { width: 100%; height: 28px; }
+  select {
+    width: 100%;
+    padding: 8px 10px;
+    font: inherit;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fff;
+    min-height: 40px;
+  }
+  button[type="button"]:not(.handle) {
+    appearance: none;
+    border: 1px solid #ccc;
+    background: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font: inherit;
+    cursor: pointer;
+    min-height: 36px;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  td { padding: 5px 0; border-bottom: 1px solid #f0f0f0; }
   td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
   .over { color: #c22; font-weight: 600; }
-  .hint { color: #888; font-size: 11px; margin: 4px 0 8px; }
-  footer { margin-top: 24px; padding-top: 12px; border-top: 1px solid #eee; color: #999; font-size: 11px; }
-  footer p { margin: 0; }
-  .detail { background: #fafafa; margin: 12px -20px 0; padding: 12px 20px; border-top: 2px solid #ddd; }
+  .hint { color: #888; font-size: 12px; margin: 4px 0 8px; }
+  footer {
+    margin-top: 24px;
+    padding-top: 12px;
+    border-top: 1px solid #eee;
+    color: #888;
+    font-size: 11px;
+  }
+  footer p { margin: 0 0 4px; }
+  .detail {
+    background: #f6f7f9;
+    margin: 12px -20px 0;
+    padding: 12px 20px;
+    border-top: 2px solid #ddd;
+  }
+  details > summary {
+    cursor: pointer;
+    padding: 6px 0;
+    list-style: none;
+    color: #444;
+    -webkit-tap-highlight-color: transparent;
+  }
+  details > summary::-webkit-details-marker { display: none; }
+  details[open] > summary { font-weight: 500; }
+
+  @media (prefers-color-scheme: dark) {
+    .sidebar {
+      background: rgba(28, 30, 33, 0.96);
+      color: #e6e8eb;
+      border-left-color: #333;
+      border-top-color: #333;
+    }
+    h2, h3, header p, .hint, footer, .caret { color: #aaa; }
+    .handle-summary .muted { color: #999; }
+    .grip { background: #444; }
+    section, label, td { border-color: #2a2d31; }
+    input[type="number"], select, button[type="button"]:not(.handle) {
+      background: #222528;
+      border-color: #3a3d41;
+      color: #e6e8eb;
+    }
+    .detail { background: #1f2226; border-top-color: #3a3d41; }
+    .handle { border-bottom-color: #2a2d31; }
+  }
 </style>

@@ -114,7 +114,7 @@
           radius: 3, color: '#222', weight: 0.6, fillColor: '#fff', fillOpacity: 0.9
         })
           .bindTooltip(`${a.street} ${a.housenumber}`, { direction: 'top' })
-          .on('click', () => { ui.selectedAddressId = a.id; ui.selectedSpotId = null; })
+          .on('click', () => { ui.selectedAddressId = a.id; ui.selectedSpotId = null; ui.sheetOpen = true; })
       )
     );
 
@@ -134,7 +134,7 @@
           radius: 6, color: '#003e8c', weight: 1.5, fillColor: '#3af', fillOpacity: 0.95
         })
           .bindTooltip(`bike rack · ${s.street} (${s.side})`, { direction: 'top' })
-          .on('click', () => { ui.selectedSpotId = s.id; ui.selectedAddressId = null; })
+          .on('click', () => { ui.selectedSpotId = s.id; ui.selectedAddressId = null; ui.sheetOpen = true; })
       )
     );
 
@@ -144,7 +144,7 @@
           radius: 5, color: '#7a2900', weight: 1, fillColor: '#f96', fillOpacity: 0.95
         })
           .bindTooltip(`car spot · ${s.street} (${s.side})`, { direction: 'top' })
-          .on('click', () => { ui.selectedSpotId = s.id; ui.selectedAddressId = null; })
+          .on('click', () => { ui.selectedSpotId = s.id; ui.selectedAddressId = null; ui.sheetOpen = true; })
       )
     );
 
@@ -244,6 +244,31 @@
     position: absolute;
     inset: 0;
     background: #eef;
+    touch-action: pan-x pan-y; /* allow Leaflet's own gestures, block browser nav */
   }
-  :global(.leaflet-container) { font: inherit; }
+  :global(.leaflet-container) {
+    font: inherit;
+    background: #eef;
+  }
+  /* Push Leaflet's zoom controls clear of the iOS safe-area + sheet handle */
+  :global(.leaflet-top.leaflet-left) {
+    top: calc(env(safe-area-inset-top, 0) + 8px);
+    left: calc(env(safe-area-inset-left, 0) + 8px);
+  }
+  :global(.leaflet-control-zoom a) {
+    width: 36px !important;
+    height: 36px !important;
+    line-height: 36px !important;
+    font-size: 20px !important;
+  }
+  @media (max-width: 767px) {
+    /* Leave room for the collapsed bottom sheet (~72px) so the attribution
+       doesn't disappear under it. Bottom sheet uses bottom inset already. */
+    :global(.leaflet-bottom) {
+      bottom: calc(72px + env(safe-area-inset-bottom, 0)) !important;
+    }
+  }
+  @media (prefers-color-scheme: dark) {
+    .map, :global(.leaflet-container) { background: #1a1c1e; }
+  }
 </style>

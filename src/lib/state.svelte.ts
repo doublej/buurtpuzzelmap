@@ -71,6 +71,7 @@ export const ui = $state({
   showBuildings: false,
   showRoads: false,
   showPDF: true,
+  sheetOpen: false,           // mobile bottom-sheet expanded state
   pdfOpacity: 0.55,
   pdfRotation: DEFAULT_PDF_ROTATION,
   pdfBounds: { ...DEFAULT_PDF_BOUNDS },
