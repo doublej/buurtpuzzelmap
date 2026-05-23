@@ -1,0 +1,19 @@
+{
+  "bbox": [
+    5.1155,
+    52.0735,
+    5.1205,
+    52.0762
+  ],
+  "center": [
+    5.118,
+    52.0748
+  ],
+  "counts": {
+    "roads": 34,
+    "buildings": 771,
+    "addresses": 676,
+    "bike_parking_osm": 0,
+    "car_parking_osm": 14
+  }
+}

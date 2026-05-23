@@ -1,0 +1,185 @@
+{
+  "_comment": "Bike rack and car parking placement from PDF 'Ontwerp Buurtpuzzel laatste fase'. Counts and segments traced visually. Sides: 'north', 'south', 'east', 'west', 'both'. Offset is metres perpendicular to road centerline.",
+  "source": "Ontwerp Buurtpuzzel laatste fase (1).pdf",
+  "bike_parking_segments": [
+    {
+      "id": "bp-mijdrecht-south",
+      "street": "Mijdrechtstraat",
+      "from": [5.11700, 52.07530],
+      "to": [5.11960, 52.07560],
+      "side": "south",
+      "offset_m": 4,
+      "racks": 14,
+      "notes": "Fietsnietjes along south curb of Mijdrechtstraat in redesign zone."
+    },
+    {
+      "id": "bp-mijdrecht-north",
+      "street": "Mijdrechtstraat",
+      "from": [5.11700, 52.07560],
+      "to": [5.11960, 52.07565],
+      "side": "north",
+      "offset_m": 4,
+      "racks": 6,
+      "notes": "Smaller cluster on north side near corners."
+    },
+    {
+      "id": "bp-alblas-east",
+      "street": "Alblasstraat",
+      "from": [5.11800, 52.07510],
+      "to": [5.11800, 52.07418],
+      "side": "east",
+      "offset_m": 4,
+      "racks": 8,
+      "notes": "Along east side of Alblasstraat."
+    },
+    {
+      "id": "bp-alblas-west",
+      "street": "Alblasstraat",
+      "from": [5.11790, 52.07510],
+      "to": [5.11790, 52.07418],
+      "side": "west",
+      "offset_m": 4,
+      "racks": 6
+    },
+    {
+      "id": "bp-nieuwraven-east",
+      "street": "Nieuwravenstraat",
+      "from": [5.11885, 52.07500],
+      "to": [5.11885, 52.07410],
+      "side": "east",
+      "offset_m": 4,
+      "racks": 8
+    },
+    {
+      "id": "bp-nieuwraven-west",
+      "street": "Nieuwravenstraat",
+      "from": [5.11875, 52.07500],
+      "to": [5.11875, 52.07410],
+      "side": "west",
+      "offset_m": 4,
+      "racks": 6
+    },
+    {
+      "id": "bp-volkerak-north",
+      "street": "Volkerakstraat",
+      "from": [5.11680, 52.07476],
+      "to": [5.11920, 52.07476],
+      "side": "north",
+      "offset_m": 4,
+      "racks": 10,
+      "notes": "Dense cluster at Volkerakstraat north curb in redesign zone."
+    },
+    {
+      "id": "bp-volkerak-south",
+      "street": "Volkerakstraat",
+      "from": [5.11680, 52.07472],
+      "to": [5.11920, 52.07472],
+      "side": "south",
+      "offset_m": 4,
+      "racks": 6
+    },
+    {
+      "id": "bp-runstraat-intersection",
+      "street": "Runstraat",
+      "from": [5.11650, 52.07472],
+      "to": [5.11650, 52.07500],
+      "side": "both",
+      "offset_m": 4,
+      "racks": 14,
+      "notes": "Heavy bike-rack cluster at Runstraat-Volkerakstraat intersection from PDF."
+    }
+  ],
+  "car_parking_segments": [
+    {
+      "id": "cp-mijdrecht-south",
+      "street": "Mijdrechtstraat",
+      "from": [5.11700, 52.07527],
+      "to": [5.11960, 52.07555],
+      "side": "south",
+      "offset_m": 3,
+      "spots": 12,
+      "parking_type": "parallel"
+    },
+    {
+      "id": "cp-mijdrecht-north",
+      "street": "Mijdrechtstraat",
+      "from": [5.11700, 52.07565],
+      "to": [5.11960, 52.07570],
+      "side": "north",
+      "offset_m": 3,
+      "spots": 12
+    },
+    {
+      "id": "cp-alblas-east",
+      "street": "Alblasstraat",
+      "from": [5.11805, 52.07505],
+      "to": [5.11805, 52.07420],
+      "side": "east",
+      "offset_m": 3,
+      "spots": 18
+    },
+    {
+      "id": "cp-alblas-west",
+      "street": "Alblasstraat",
+      "from": [5.11785, 52.07505],
+      "to": [5.11785, 52.07420],
+      "side": "west",
+      "offset_m": 3,
+      "spots": 18
+    },
+    {
+      "id": "cp-nieuwraven-east",
+      "street": "Nieuwravenstraat",
+      "from": [5.11890, 52.07495],
+      "to": [5.11890, 52.07415],
+      "side": "east",
+      "offset_m": 3,
+      "spots": 16
+    },
+    {
+      "id": "cp-nieuwraven-west",
+      "street": "Nieuwravenstraat",
+      "from": [5.11870, 52.07495],
+      "to": [5.11870, 52.07415],
+      "side": "west",
+      "offset_m": 3,
+      "spots": 16
+    },
+    {
+      "id": "cp-volkerak-north",
+      "street": "Volkerakstraat",
+      "from": [5.11680, 52.07473],
+      "to": [5.11920, 52.07478],
+      "side": "north",
+      "offset_m": 3,
+      "spots": 14
+    },
+    {
+      "id": "cp-volkerak-south",
+      "street": "Volkerakstraat",
+      "from": [5.11680, 52.07469],
+      "to": [5.11920, 52.07473],
+      "side": "south",
+      "offset_m": 3,
+      "spots": 14
+    },
+    {
+      "id": "cp-runstraat-west",
+      "street": "Runstraat",
+      "from": [5.11635, 52.07430],
+      "to": [5.11635, 52.07510],
+      "side": "west",
+      "offset_m": 3,
+      "spots": 16
+    },
+    {
+      "id": "cp-runstraat-east",
+      "street": "Runstraat",
+      "from": [5.11655, 52.07430],
+      "to": [5.11655, 52.07510],
+      "side": "east",
+      "offset_m": 3,
+      "spots": 16
+    }
+  ]
+}
