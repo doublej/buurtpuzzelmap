@@ -164,7 +164,10 @@
     if (!visible && map.hasLayer(layer)) map.removeLayer(layer);
   }
 
-  $effect(() => { if (ready) applyBasemap(); });
+  $effect(() => {
+    void ui.basemap;
+    if (ready) applyBasemap();
+  });
   $effect(() => {
     if (!ready) return;
     void ui.pdfBounds.north; void ui.pdfBounds.south; void ui.pdfBounds.east; void ui.pdfBounds.west;

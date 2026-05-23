@@ -20,12 +20,28 @@
 
   $effect(() => {
     if (!layers) return;
+    // Read individual properties so this effect subscribes to each one;
+    // $state.snapshot() does not always register fine-grained deps in builds.
+    const p = defaults.persons_per_hh;
+    const c = defaults.cars_per_hh;
+    const b = defaults.bikes_per_person;
+    // Touch each override so this effect re-runs when any value within them changes.
+    let overrideFingerprint = '';
+    for (const k of Object.keys(overrides)) {
+      const v = overrides[k];
+      overrideFingerprint += `${k}:${v?.households ?? ''},${v?.persons ?? ''},${v?.cars ?? ''},${v?.bikes ?? ''};`;
+    }
+    void overrideFingerprint;
+
     const bikeSpots = layers.bikeDesign;
     const carSpots = layers.carDesign;
     const assignments = assignAll(layers.addresses, bikeSpots, carSpots);
 
     const demands = new Map(
-      layers.addresses.map((a) => [a.id, defaultDemand(a, $state.snapshot(defaults), $state.snapshot(overrides))])
+      layers.addresses.map((a) => [
+        a.id,
+        defaultDemand(a, { persons_per_hh: p, cars_per_hh: c, bikes_per_person: b }, overrides)
+      ])
     );
 
     results.assignments = assignments;
