@@ -52,7 +52,9 @@
     }
     const overBike = results.bikeLoad.filter((r) => r.utilization > 1).length;
     const overCar = results.carLoad.filter((r) => r.utilization > 1).length;
-    return { bikeCapacity, bikeAssigned, carCapacity, carAssigned, overBike, overCar };
+    const peakBike = results.bikeLoad.reduce((m, r) => Math.max(m, r.utilization), 0);
+    const peakCar = results.carLoad.reduce((m, r) => Math.max(m, r.utilization), 0);
+    return { bikeCapacity, bikeAssigned, carCapacity, carAssigned, overBike, overCar, peakBike, peakCar };
   });
 
   function updateOverride(field: 'households' | 'persons' | 'cars' | 'bikes', value: string) {
@@ -160,11 +162,20 @@
         <tr><td>Bike capacity (design)</td><td>{totals.bikeCapacity}</td></tr>
         <tr><td>Bike demand (assigned)</td><td>{Math.round(totals.bikeAssigned)}</td></tr>
         <tr><td>Bike spots over capacity</td><td>{totals.overBike}</td></tr>
+        <tr><td>Bike peak utilization</td><td class:over={totals.peakBike > 1}>{(totals.peakBike * 100).toFixed(0)}%</td></tr>
         <tr><td>Car capacity (design)</td><td>{totals.carCapacity}</td></tr>
         <tr><td>Car demand (assigned)</td><td>{Math.round(totals.carAssigned)}</td></tr>
         <tr><td>Car spots over capacity</td><td>{totals.overCar}</td></tr>
+        <tr><td>Car peak utilization</td><td class:over={totals.peakCar > 1}>{(totals.peakCar * 100).toFixed(0)}%</td></tr>
       </tbody>
     </table>
+    <div class="legend" aria-label="Utilization color scale">
+      <div class="bar"></div>
+      <div class="ticks">
+        <span>0%</span><span>50%</span><span>100%</span><span>150%</span><span>200%+</span>
+      </div>
+      <p class="hint">Color and size scale with utilization. Larger and darker red = more severe overload.</p>
+    </div>
   </section>
 
   {#if selectedAddress}
@@ -425,6 +436,27 @@
     text-transform: uppercase;
     letter-spacing: 0.04em;
     white-space: nowrap;
+  }
+  .legend { margin-top: 10px; }
+  .legend .bar {
+    height: 10px;
+    border-radius: 3px;
+    background: linear-gradient(
+      to right,
+      hsl(145 55% 60%) 0%,
+      hsl(97 67% 58%) 25%,
+      hsl(50 80% 55%) 50%,
+      hsl(25 89% 41%) 75%,
+      hsl(0 95% 27%) 100%
+    );
+  }
+  .legend .ticks {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #888;
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
   }
   footer {
     margin-top: 24px;

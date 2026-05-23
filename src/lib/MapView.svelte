@@ -262,22 +262,56 @@
     groupBikeDesign.eachLayer((lyr) => {
       const s = layers.bikeDesign[i++];
       const util = bikeById.get(s.id)?.utilization ?? 0;
-      (lyr as any).setStyle({ fillColor: utilToColor(util) });
+      applyUtilStyle(lyr as any, util, 'bike', 6);
     });
     let j = 0;
     groupCarDesign.eachLayer((lyr) => {
       const s = layers.carDesign[j++];
       const util = carById.get(s.id)?.utilization ?? 0;
-      (lyr as any).setStyle({ fillColor: utilToColor(util) });
+      applyUtilStyle(lyr as any, util, 'car', 5);
     });
   }
 
+  function applyUtilStyle(marker: any, util: number, kind: 'bike' | 'car', baseRadius: number) {
+    marker.setStyle({ fillColor: utilToColor(util), ...utilToStroke(util, kind) });
+    marker.setRadius(utilToRadius(baseRadius, util));
+  }
+
+  // Continuous gradient: empty -> green -> yellow at capacity ->
+  // orange -> deep red as overload grows. Saturation and darkness
+  // both intensify past 100% so heavy overloads read as more severe.
   function utilToColor(util: number): string {
-    if (util === 0) return '#cde';
-    if (util < 0.5) return '#3c9';
-    if (util < 1) return '#fc3';
-    if (util < 1.5) return '#f73';
-    return '#c22';
+    if (util <= 0) return '#e6ecf2';
+    let h: number, s: number, l: number;
+    if (util <= 1) {
+      const t = util;
+      h = 145 - 95 * t;
+      s = 55 + 25 * t;
+      l = 60 - 5 * t;
+    } else {
+      const t = Math.min(util - 1, 1.5) / 1.5;
+      h = 50 - 50 * t;
+      s = 80 + 15 * t;
+      l = 55 - 28 * t;
+    }
+    return `hsl(${h.toFixed(0)} ${s.toFixed(0)}% ${l.toFixed(0)}%)`;
+  }
+
+  function utilToRadius(base: number, util: number): number {
+    if (util <= 1) return base;
+    const over = Math.min(util - 1, 2);
+    return base * (1 + over * 0.4);
+  }
+
+  function utilToStroke(util: number, kind: 'bike' | 'car') {
+    if (util <= 1) {
+      return kind === 'bike'
+        ? { color: '#003e8c', weight: 1.5 }
+        : { color: '#7a2900', weight: 1 };
+    }
+    if (util < 1.5) return { color: '#8b1a00', weight: 1.5 };
+    if (util < 2.5) return { color: '#5a0000', weight: 2 };
+    return { color: '#2a0000', weight: 2.5 };
   }
 
   onDestroy(() => { map?.remove(); });
