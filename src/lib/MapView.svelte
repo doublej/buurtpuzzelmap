@@ -1,9 +1,8 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-  import type { Map as LMap, TileLayer, Layer, LayerGroup, ImageOverlay } from 'leaflet';
+  import type { Map as LMap, TileLayer, Layer, LayerGroup } from 'leaflet';
   import type { Layers } from '$lib/data/load';
   import { ui, basemaps, results } from '$lib/state.svelte';
-  import { base } from '$app/paths';
 
   interface Props { layers: Layers; }
   let { layers }: Props = $props();
@@ -13,7 +12,6 @@
   let L: typeof import('leaflet');
 
   let tileLayer: TileLayer | null = null;
-  let pdfOverlay: ImageOverlay | null = null;
 
   let groupBuildings: LayerGroup;
   let groupRoads: LayerGroup;
@@ -34,7 +32,6 @@
 
     map = L.map(mapEl, { zoomControl: true, preferCanvas: true });
     map.setView([cLat, cLng], 18);
-    map.on('moveend zoomend viewreset', () => applyPDFRotation());
 
     // Delegate clicks inside popups (the "Edit overrides" link).
     map.on('popupopen', (e: any) => {
@@ -51,7 +48,6 @@
 
     applyBasemap();
     buildLayers();
-    applyPDF();
     bindToggles();
     repaintDesignByLoad();
 
@@ -76,36 +72,6 @@
     });
     tileLayer.addTo(map);
     tileLayer.bringToBack();
-  }
-
-  function applyPDF() {
-    if (pdfOverlay) { pdfOverlay.remove(); pdfOverlay = null; }
-    if (!ui.showPDF) return;
-    const b = ui.pdfBounds;
-    pdfOverlay = L.imageOverlay(`${base}/data/design-plan-cropped.png`, [
-      [b.south, b.west],
-      [b.north, b.east]
-    ], { opacity: ui.pdfOpacity, interactive: false }).addTo(map);
-    if (tileLayer) tileLayer.bringToBack();
-    pdfOverlay.bringToBack();
-    if (tileLayer) tileLayer.bringToBack();
-    applyPDFRotation();
-  }
-
-  function applyPDFRotation() {
-    if (!pdfOverlay) return;
-    const el = pdfOverlay.getElement() as HTMLImageElement | undefined;
-    if (!el) return;
-    const r = ui.pdfRotation || 0;
-    // Strip any rotation we previously added; only append if non-zero so we
-    // don't fight Leaflet's own transform updates during pan/zoom.
-    const existing = el.style.transform.replace(/\s*rotate\([^)]*\)/g, '').trim();
-    if (r === 0) {
-      el.style.transform = existing;
-      return;
-    }
-    el.style.transformOrigin = 'center center';
-    el.style.transform = `${existing} rotate(${r}deg)`.trim();
   }
 
   function buildLayers() {
@@ -224,18 +190,6 @@
   $effect(() => {
     void ui.basemap;
     if (ready) applyBasemap();
-  });
-  $effect(() => {
-    if (!ready) return;
-    void ui.pdfBounds.north; void ui.pdfBounds.south; void ui.pdfBounds.east; void ui.pdfBounds.west;
-    void ui.pdfOpacity; void ui.showPDF;
-    applyPDF();
-  });
-
-  $effect(() => {
-    if (!ready) return;
-    void ui.pdfRotation;
-    applyPDFRotation();
   });
   $effect(() => {
     if (!ready) return;

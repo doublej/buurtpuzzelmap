@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Layers } from '$lib/data/load';
-  import { defaults, overrides, ui, results, basemaps, persistOverrides, persistUI, resetPDFBounds, type BasemapKey } from '$lib/state.svelte';
+  import { defaults, overrides, ui, results, basemaps, persistOverrides, persistUI, type BasemapKey } from '$lib/state.svelte';
 
   interface Props {
     layers: Layers;
@@ -105,36 +105,6 @@
     <label><input type="checkbox" bind:checked={ui.showCarDesign} /> Car spots <span class="badge">used in calc</span></label>
     <label><input type="checkbox" bind:checked={ui.showCarOSM} /> Car parking (existing, OSM)</label>
     <label><input type="checkbox" bind:checked={ui.showTrees} /> Trees (detected)</label>
-  </section>
-
-  <section>
-    <h2>PDF overlay</h2>
-    <label><input type="checkbox" bind:checked={ui.showPDF} /> Show design PDF</label>
-    <label class="range">
-      Opacity {ui.pdfOpacity.toFixed(2)}
-      <input type="range" min="0" max="1" step="0.05" bind:value={ui.pdfOpacity} onchange={persistUI} />
-    </label>
-    <label class="range">
-      Rotation {ui.pdfRotation.toFixed(1)}°
-      <input type="range" min="-15" max="15" step="0.1" bind:value={ui.pdfRotation} onchange={persistUI} />
-    </label>
-    <details>
-      <summary>Align bounds</summary>
-      <label class="num">N
-        <input type="number" step="0.0001" bind:value={ui.pdfBounds.north} onchange={persistUI} />
-      </label>
-      <label class="num">S
-        <input type="number" step="0.0001" bind:value={ui.pdfBounds.south} onchange={persistUI} />
-      </label>
-      <label class="num">W
-        <input type="number" step="0.0001" bind:value={ui.pdfBounds.west} onchange={persistUI} />
-      </label>
-      <label class="num">E
-        <input type="number" step="0.0001" bind:value={ui.pdfBounds.east} onchange={persistUI} />
-      </label>
-      <p class="hint">Tweak in steps of ~0.0001 (~10 m) to align the PDF with OSM streets. Saved to your browser.</p>
-      <button type="button" onclick={resetPDFBounds}>Reset</button>
-    </details>
   </section>
 
   <section>
@@ -381,7 +351,6 @@
     -webkit-tap-highlight-color: transparent;
   }
   label.num { justify-content: space-between; }
-  label.range { flex-direction: column; align-items: stretch; gap: 4px; }
   input[type="checkbox"] {
     width: 20px;
     height: 20px;
@@ -400,7 +369,6 @@
     font-variant-numeric: tabular-nums;
     min-height: 36px;
   }
-  input[type="range"] { width: 100%; height: 28px; }
   select {
     width: 100%;
     padding: 8px 10px;
@@ -472,16 +440,6 @@
     padding: 12px 20px;
     border-top: 2px solid #ddd;
   }
-  details > summary {
-    cursor: pointer;
-    padding: 6px 0;
-    list-style: none;
-    color: #444;
-    -webkit-tap-highlight-color: transparent;
-  }
-  details > summary::-webkit-details-marker { display: none; }
-  details[open] > summary { font-weight: 500; }
-
   @media (prefers-color-scheme: dark) {
     .sidebar {
       background: rgba(28, 30, 33, 0.96);

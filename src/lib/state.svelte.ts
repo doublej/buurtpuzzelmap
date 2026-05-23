@@ -51,16 +51,6 @@ export const basemaps: Record<BasemapKey, { name: string; url: string; attributi
   }
 };
 
-const DEFAULT_PDF_BOUNDS = {
-  // tuned visually so the cropped PDF lines up roughly with the OSM streets.
-  // editable in the UI (with rotation around the centre).
-  south: 52.07320,
-  north: 52.07620,
-  west: 5.11530,
-  east: 5.12030
-};
-const DEFAULT_PDF_ROTATION = 0;
-
 export const ui = $state({
   showAddresses: true,
   showCarOSM: true,
@@ -69,11 +59,7 @@ export const ui = $state({
   showTrees: true,
   showBuildings: false,
   showRoads: false,
-  showPDF: true,
-  sheetOpen: false,           // mobile bottom-sheet expanded state
-  pdfOpacity: 0.55,
-  pdfRotation: DEFAULT_PDF_ROTATION,
-  pdfBounds: { ...DEFAULT_PDF_BOUNDS },
+  sheetOpen: false,
   basemap: 'pdokLuchtfoto' as BasemapKey,
   selectedAddressId: null as string | null,
   selectedSpotId: null as string | null,
@@ -103,9 +89,6 @@ export function loadOverrides() {
     const raw = localStorage.getItem(UI_KEY);
     if (raw) {
       const saved = JSON.parse(raw);
-      if (saved.pdfBounds) ui.pdfBounds = { ...DEFAULT_PDF_BOUNDS, ...saved.pdfBounds };
-      if (typeof saved.pdfOpacity === 'number') ui.pdfOpacity = saved.pdfOpacity;
-      if (typeof saved.pdfRotation === 'number') ui.pdfRotation = saved.pdfRotation;
       if (typeof saved.basemap === 'string') ui.basemap = saved.basemap;
     }
   } catch { /* */ }
@@ -119,15 +102,6 @@ export function persistOverrides() {
 export function persistUI() {
   if (typeof localStorage === 'undefined') return;
   localStorage.setItem(UI_KEY, JSON.stringify({
-    pdfBounds: ui.pdfBounds,
-    pdfOpacity: ui.pdfOpacity,
-    pdfRotation: ui.pdfRotation,
     basemap: ui.basemap
   }));
-}
-
-export function resetPDFBounds() {
-  ui.pdfBounds = { ...DEFAULT_PDF_BOUNDS };
-  ui.pdfRotation = DEFAULT_PDF_ROTATION;
-  persistUI();
 }
