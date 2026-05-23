@@ -45,7 +45,10 @@
     // Ensure the container has its real size before final zoom
     requestAnimationFrame(() => {
       map.invalidateSize();
-      map.fitBounds([[s, w], [n, e]], { padding: [40, 380] });
+      map.fitBounds([[s, w], [n, e]], { padding: [40, 380], maxZoom: 18 });
+      // fitBounds can land on a low zoom if the right-side sidebar makes the
+      // usable map area narrow; clamp to a sensible neighborhood scale.
+      if (map.getZoom() < 17) map.setZoom(17);
       ready = true;
     });
   });
