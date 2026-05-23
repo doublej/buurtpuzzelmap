@@ -12,3 +12,5 @@ vite.config.ts.timestamp-*
 /plan-*.png
 /crop_*.png
 /reference/
+/debug_*.png
+/scripts/.venv/
