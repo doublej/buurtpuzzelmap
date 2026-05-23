@@ -93,6 +93,7 @@
     <label><input type="checkbox" bind:checked={ui.showCarOSM} /> Car parking (OSM)</label>
     <label><input type="checkbox" bind:checked={ui.showBikeDesign} /> Bike racks (design)</label>
     <label><input type="checkbox" bind:checked={ui.showCarDesign} /> Car spots (design)</label>
+    <label><input type="checkbox" bind:checked={ui.showTrees} /> Trees (detected from PDF)</label>
   </section>
 
   <section>
@@ -213,7 +214,9 @@
   {/if}
 
   <footer>
-    <p>Data: OSM via Overpass · design from PDF</p>
+    <p>Roads, buildings, addresses, existing parking: OpenStreetMap via Overpass.</p>
+    <p>Bike racks + trees: detected from the design PDF via color thresholding (blue dashes = fietsnietjes per legend).</p>
+    <p>Car parking: still interpolated along centerlines — not yet detected.</p>
   </footer>
 </aside>
 

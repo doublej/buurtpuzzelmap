@@ -8,6 +8,13 @@ async function fetchJson<T>(path: string): Promise<T> {
   return r.json() as Promise<T>;
 }
 
+export interface TreeFeature {
+  id: string;
+  lng: number;
+  lat: number;
+  source: string;
+}
+
 export interface Layers {
   roads: FeatureCollection<LineString>;
   buildings: FeatureCollection<Polygon>;
@@ -16,6 +23,7 @@ export interface Layers {
   carOSM: FeatureCollection;
   bikeDesign: ParkingSpot[];
   carDesign: ParkingSpot[];
+  trees: TreeFeature[];
   meta: {
     bbox: [number, number, number, number];
     center: [number, number];
@@ -24,7 +32,7 @@ export interface Layers {
 }
 
 export async function loadAllLayers(): Promise<Layers> {
-  const [roads, buildings, addrFc, bikeOSM, carOSM, bikeFc, carFc, meta] = await Promise.all([
+  const [roads, buildings, addrFc, bikeOSM, carOSM, bikeFc, carFc, treeFc, meta] = await Promise.all([
     fetchJson<FeatureCollection<LineString>>('/data/roads.geojson'),
     fetchJson<FeatureCollection<Polygon>>('/data/buildings.geojson'),
     fetchJson<FeatureCollection<Point>>('/data/addresses.geojson'),
@@ -32,6 +40,7 @@ export async function loadAllLayers(): Promise<Layers> {
     fetchJson<FeatureCollection>('/data/car_parking.geojson'),
     fetchJson<FeatureCollection<Point>>('/data/bike_parking_design.geojson'),
     fetchJson<FeatureCollection<Point>>('/data/car_parking_design.geojson'),
+    fetchJson<FeatureCollection<Point>>('/data/trees_detected.geojson'),
     fetchJson<Layers['meta']>('/data/meta.json')
   ]);
 
@@ -69,5 +78,12 @@ export async function loadAllLayers(): Promise<Layers> {
     lat: f.geometry.coordinates[1]
   }));
 
-  return { roads, buildings, addresses, bikeOSM, carOSM, bikeDesign, carDesign, meta };
+  const trees: TreeFeature[] = treeFc.features.map((f) => ({
+    id: String(f.id),
+    lng: f.geometry.coordinates[0],
+    lat: f.geometry.coordinates[1],
+    source: f.properties?.source ?? 'pdf_detected'
+  }));
+
+  return { roads, buildings, addresses, bikeOSM, carOSM, bikeDesign, carDesign, trees, meta };
 }

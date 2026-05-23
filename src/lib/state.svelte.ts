@@ -67,6 +67,7 @@ export const ui = $state({
   showCarOSM: true,
   showBikeDesign: true,
   showCarDesign: true,
+  showTrees: true,
   showBuildings: false,
   showRoads: false,
   showPDF: true,

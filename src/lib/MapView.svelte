@@ -22,6 +22,7 @@
   let groupCarOSM: LayerGroup;
   let groupBikeDesign: LayerGroup;
   let groupCarDesign: LayerGroup;
+  let groupTrees: LayerGroup;
   let ready = $state(false);
 
   onMount(async () => {
@@ -146,6 +147,14 @@
           .on('click', () => { ui.selectedSpotId = s.id; ui.selectedAddressId = null; })
       )
     );
+
+    groupTrees = L.layerGroup(
+      layers.trees.map((t) =>
+        L.circleMarker([t.lat, t.lng], {
+          radius: 4, color: '#0a5e1c', weight: 1.5, fillColor: '#3aa64a', fillOpacity: 0.8
+        }).bindTooltip('tree (detected from PDF)', { direction: 'top' })
+      )
+    );
   }
 
   function bindToggles() {
@@ -156,6 +165,7 @@
     syncLayer(groupCarOSM, ui.showCarOSM);
     syncLayer(groupBikeDesign, ui.showBikeDesign);
     syncLayer(groupCarDesign, ui.showCarDesign);
+    syncLayer(groupTrees, ui.showTrees);
   }
 
   function syncLayer(layer: Layer | null, visible: boolean) {
@@ -189,6 +199,7 @@
     syncLayer(groupCarOSM, ui.showCarOSM);
     syncLayer(groupBikeDesign, ui.showBikeDesign);
     syncLayer(groupCarDesign, ui.showCarDesign);
+    syncLayer(groupTrees, ui.showTrees);
   });
 
   $effect(() => {
