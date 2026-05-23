@@ -99,11 +99,10 @@
     <label><input type="checkbox" bind:checked={ui.showRoads} /> Roads (OSM)</label>
     <label><input type="checkbox" bind:checked={ui.showBuildings} /> Buildings (OSM)</label>
     <label><input type="checkbox" bind:checked={ui.showAddresses} /> Addresses (OSM)</label>
-    <label><input type="checkbox" bind:checked={ui.showBikeOSM} /> Bike parking (OSM)</label>
-    <label><input type="checkbox" bind:checked={ui.showCarOSM} /> Car parking (OSM)</label>
-    <label><input type="checkbox" bind:checked={ui.showBikeDesign} /> Bike racks (design)</label>
-    <label><input type="checkbox" bind:checked={ui.showCarDesign} /> Car spots (design)</label>
-    <label><input type="checkbox" bind:checked={ui.showTrees} /> Trees (detected from PDF)</label>
+    <label><input type="checkbox" bind:checked={ui.showBikeDesign} /> Bike racks <span class="badge">used in calc</span></label>
+    <label><input type="checkbox" bind:checked={ui.showCarDesign} /> Car spots <span class="badge">used in calc</span></label>
+    <label><input type="checkbox" bind:checked={ui.showCarOSM} /> Car parking (existing, OSM)</label>
+    <label><input type="checkbox" bind:checked={ui.showTrees} /> Trees (detected)</label>
   </section>
 
   <section>
@@ -416,6 +415,17 @@
   td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
   .over { color: #c22; font-weight: 600; }
   .hint { color: #888; font-size: 12px; margin: 4px 0 8px; }
+  .badge {
+    margin-left: auto;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: #e3f0ff;
+    color: #0a64c8;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
   footer {
     margin-top: 24px;
     padding-top: 12px;

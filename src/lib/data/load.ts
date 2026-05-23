@@ -19,7 +19,6 @@ export interface Layers {
   roads: FeatureCollection<LineString>;
   buildings: FeatureCollection<Polygon>;
   addresses: Address[];
-  bikeOSM: FeatureCollection<Point>;
   carOSM: FeatureCollection;
   bikeDesign: ParkingSpot[];
   carDesign: ParkingSpot[];
@@ -32,11 +31,10 @@ export interface Layers {
 }
 
 export async function loadAllLayers(): Promise<Layers> {
-  const [roads, buildings, addrFc, bikeOSM, carOSM, bikeFc, carFc, treeFc, meta] = await Promise.all([
+  const [roads, buildings, addrFc, carOSM, bikeFc, carFc, treeFc, meta] = await Promise.all([
     fetchJson<FeatureCollection<LineString>>('/data/roads.geojson'),
     fetchJson<FeatureCollection<Polygon>>('/data/buildings.geojson'),
     fetchJson<FeatureCollection<Point>>('/data/addresses.geojson'),
-    fetchJson<FeatureCollection<Point>>('/data/bike_parking.geojson'),
     fetchJson<FeatureCollection>('/data/car_parking.geojson'),
     fetchJson<FeatureCollection<Point>>('/data/bike_parking_design.geojson'),
     fetchJson<FeatureCollection<Point>>('/data/car_parking_design.geojson'),
@@ -85,5 +83,5 @@ export async function loadAllLayers(): Promise<Layers> {
     source: f.properties?.source ?? 'pdf_detected'
   }));
 
-  return { roads, buildings, addresses, bikeOSM, carOSM, bikeDesign, carDesign, trees, meta };
+  return { roads, buildings, addresses, carOSM, bikeDesign, carDesign, trees, meta };
 }

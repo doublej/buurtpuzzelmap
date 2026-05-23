@@ -63,7 +63,6 @@ const DEFAULT_PDF_ROTATION = 0;
 
 export const ui = $state({
   showAddresses: true,
-  showBikeOSM: true,
   showCarOSM: true,
   showBikeDesign: true,
   showCarDesign: true,

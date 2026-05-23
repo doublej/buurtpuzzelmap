@@ -18,7 +18,6 @@
   let groupBuildings: LayerGroup;
   let groupRoads: LayerGroup;
   let groupAddresses: LayerGroup;
-  let groupBikeOSM: LayerGroup;
   let groupCarOSM: LayerGroup;
   let groupBikeDesign: LayerGroup;
   let groupCarDesign: LayerGroup;
@@ -118,10 +117,6 @@
       )
     );
 
-    groupBikeOSM = L.geoJSON(layers.bikeOSM as any, {
-      pointToLayer: (_f: any, ll: any) =>
-        L.circleMarker(ll, { radius: 4, color: '#04c', fillColor: '#7af', fillOpacity: 0.9 })
-    });
     groupCarOSM = L.geoJSON(layers.carOSM as any, {
       style: { color: '#a40', weight: 1, fillColor: '#fc6', fillOpacity: 0.4 },
       pointToLayer: (_f: any, ll: any) =>
@@ -161,7 +156,6 @@
     syncLayer(groupBuildings, ui.showBuildings);
     syncLayer(groupRoads, ui.showRoads);
     syncLayer(groupAddresses, ui.showAddresses);
-    syncLayer(groupBikeOSM, ui.showBikeOSM);
     syncLayer(groupCarOSM, ui.showCarOSM);
     syncLayer(groupBikeDesign, ui.showBikeDesign);
     syncLayer(groupCarDesign, ui.showCarDesign);
@@ -195,7 +189,6 @@
     syncLayer(groupBuildings, ui.showBuildings);
     syncLayer(groupRoads, ui.showRoads);
     syncLayer(groupAddresses, ui.showAddresses);
-    syncLayer(groupBikeOSM, ui.showBikeOSM);
     syncLayer(groupCarOSM, ui.showCarOSM);
     syncLayer(groupBikeDesign, ui.showBikeDesign);
     syncLayer(groupCarDesign, ui.showCarDesign);
