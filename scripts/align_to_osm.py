@@ -19,11 +19,14 @@ ROOT = Path(__file__).resolve().parent.parent
 STATIC = ROOT / "static" / "data"
 TRANSFORM_FILE = ROOT / "scripts" / "pdf_transform.json"
 
+# Only files emitted in raw PDF-pixel space go here. car_parking_design.geojson
+# is excluded — expand_design.py snaps those to OSM road centerlines, so the
+# coordinates are already in real-world space and applying the PDF→world
+# affine on top would double-correct them.
 TARGETS = [
     STATIC / "bike_parking_design.geojson",
     STATIC / "bike_parking_detected.geojson",
     STATIC / "trees_detected.geojson",
-    STATIC / "car_parking_design.geojson",
 ]
 
 # Original PDF -> world linear map used by detect_features.py to emit the
