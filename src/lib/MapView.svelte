@@ -86,8 +86,13 @@
   function applyBasemap() {
     if (tileLayer) tileLayer.remove();
     const cfg = basemaps[ui.basemap];
-    const opts: any = { attribution: cfg.attribution, maxZoom: cfg.maxZoom };
-    if (cfg.subdomains) opts.subdomains = cfg.subdomains;
+    // Leaflet's _getSubdomain reads options.subdomains.length even when {s}
+    // isn't in the URL template, so always provide a fallback string.
+    const opts: any = {
+      attribution: cfg.attribution,
+      maxZoom: cfg.maxZoom,
+      subdomains: cfg.subdomains ?? 'abc'
+    };
     tileLayer = L.tileLayer(cfg.url, opts);
     // Cached tiles can land before the load listener attaches, leaving them stuck
     // at opacity 0. Force opacity to 1 after the image is decoded.
