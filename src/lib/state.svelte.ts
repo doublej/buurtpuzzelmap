@@ -63,7 +63,8 @@ export const ui = $state({
   basemap: 'pdokLuchtfoto' as BasemapKey,
   selectedAddressId: null as string | null,
   selectedSpotId: null as string | null,
-  loadMode: 'bike' as 'bike' | 'car'
+  loadMode: 'bike' as 'bike' | 'car',
+  calibrate: { active: false, points: [] as Array<{ n: number; lat: number; lng: number }> }
 });
 
 export const results = $state<{

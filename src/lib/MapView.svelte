@@ -33,6 +33,30 @@
     map = L.map(mapEl, { zoomControl: true, preferCanvas: true });
     map.setView([cLat, cLng], 18);
 
+    // Calibration mode: tap to drop numbered markers and show the lat/lng.
+    // Activated with ?calibrate=1 in the URL. The captured points print in the
+    // sheet for copying back.
+    const isCalibrate = typeof location !== 'undefined' && new URLSearchParams(location.search).get('calibrate') === '1';
+    if (isCalibrate) {
+      ui.calibrate.active = true;
+      map.on('click', (e: any) => {
+        if (ui.calibrate.points.length >= 4) return;
+        const n = ui.calibrate.points.length + 1;
+        const lat = Number(e.latlng.lat.toFixed(6));
+        const lng = Number(e.latlng.lng.toFixed(6));
+        ui.calibrate.points = [...ui.calibrate.points, { n, lat, lng }];
+        L.marker(e.latlng, {
+          icon: L.divIcon({
+            className: 'cal-marker',
+            html: `<div>${n}</div>`,
+            iconSize: [28, 28],
+            iconAnchor: [14, 14]
+          })
+        }).addTo(map);
+        ui.sheetOpen = true;
+      });
+    }
+
     // Delegate clicks inside popups (the "Edit overrides" link).
     map.on('popupopen', (e: any) => {
       const root: HTMLElement = e.popup.getElement();
@@ -344,6 +368,16 @@
     cursor: pointer;
     text-align: left;
     width: 100%;
+  }
+  :global(.cal-marker > div) {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: #dc1d3a;
+    color: #fff;
+    font: 700 14px/28px -apple-system, system-ui, sans-serif;
+    text-align: center;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
   }
   @media (prefers-color-scheme: dark) {
     :global(.leaflet-popup-content-wrapper),

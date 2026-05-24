@@ -89,6 +89,18 @@
     <p>Rivierenwijk Utrecht — design + parking-load model</p>
   </header>
 
+  {#if ui.calibrate.active}
+    <section class="calibrate">
+      <h2>Calibrate ({ui.calibrate.points.length}/4)</h2>
+      <p class="hint">Tap the satellite map at each numbered spot shown on the design PDF, in order 1 → 2 → 3 → 4.</p>
+      {#if ui.calibrate.points.length > 0}
+        <pre class="copyable">{ui.calibrate.points.map((p) => `${p.n}: ${p.lat}, ${p.lng}`).join('\n')}</pre>
+        <button type="button" onclick={() => { navigator.clipboard?.writeText(ui.calibrate.points.map((p) => `${p.n}: ${p.lat}, ${p.lng}`).join('\n')); }}>Copy</button>
+        <button type="button" onclick={() => { ui.calibrate.points = []; location.reload(); }}>Reset</button>
+      {/if}
+    </section>
+  {/if}
+
   <section>
     <h2>Basemap</h2>
     <select bind:value={ui.basemap} onchange={persistUI}>
@@ -408,6 +420,19 @@
     text-transform: uppercase;
     letter-spacing: 0.04em;
     white-space: nowrap;
+  }
+  .calibrate pre.copyable {
+    background: #f3f5f8;
+    border: 1px solid #dde2ea;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .calibrate button { margin-right: 6px; margin-top: 4px; }
+  @media (prefers-color-scheme: dark) {
+    .calibrate pre.copyable { background: #1e2125; border-color: #2d3137; color: #e6e8eb; }
   }
   .legend { margin-top: 10px; }
   .legend .bar {
