@@ -74,14 +74,17 @@ def detect_blue_dashes(img_arr: np.ndarray) -> np.ndarray:
     r = img_arr[:, :, 0].astype(int)
     g = img_arr[:, :, 1].astype(int)
     b = img_arr[:, :, 2].astype(int)
-    # The fietsnietjes have a saturated mid-blue (mean ~71/112/171 from sampling).
-    # Allow some range but keep clearly-blue pixels only.
+    # Each fietsnietje is a small blue dash, often anti-aliased so the edge
+    # pixels are weaker blue (b ~110-200, r ~30-150). The previous tighter
+    # threshold (b>130 & r<110) missed most of them outside one street, so
+    # we loosen on r/g/b but keep the b-r and b-g separation that excludes
+    # gray pavement and the dark building outlines.
     mask = (
-        (b > 130)
-        & (r < 110)
-        & (g < 145)
-        & (b - r > 45)
-        & (b - g > 25)
+        (b > 100)
+        & (r < 150)
+        & (g < 180)
+        & (b - r > 35)
+        & (b - g > 15)
     )
     # Cleanup: dilate then erode to merge thin gaps within a single dash
     mask = ndimage.binary_dilation(mask, iterations=1)
@@ -210,8 +213,13 @@ def main() -> None:
                 "px": [col, row]
             }
         })
-    (OUT / "bike_parking_detected.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": feats}))
-    print(f"wrote {len(feats)} bike racks → bike_parking_detected.geojson")
+    # The app loads bike_parking_design.geojson — that name is historical
+    # (from when bike racks were interpolated via expand_design.py). The
+    # detector now owns it. Write both names for backwards compat.
+    payload = json.dumps({"type": "FeatureCollection", "features": feats})
+    (OUT / "bike_parking_design.geojson").write_text(payload)
+    (OUT / "bike_parking_detected.geojson").write_text(payload)
+    print(f"wrote {len(feats)} bike racks → bike_parking_design.geojson")
 
     # Debug overlays for bikes
     Image.fromarray((mask * 255).astype(np.uint8)).save(DEBUG / "debug_bike_mask.png")

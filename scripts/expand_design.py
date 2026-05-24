@@ -183,9 +183,9 @@ def main():
         bike.extend(expand(s, "bike", roads))
     for s in cfg["car_parking_segments"]:
         car.extend(expand(s, "car", roads))
-    _w("bike_parking_design.geojson", bike)
+    # Bike racks now come from detect_features.py (PDF-based), not from
+    # interpolating along centerlines. Only car spots stay road-snapped here.
     _w("car_parking_design.geojson", car)
-    print(f"bike racks: {len(bike)} ({sum(f['properties']['capacity'] for f in bike)} bike capacity)")
     print(f"car spots:  {len(car)}")
 
 
